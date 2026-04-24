@@ -12,7 +12,7 @@ import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SendIcon from '@mui/icons-material/Send';
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutlined';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
