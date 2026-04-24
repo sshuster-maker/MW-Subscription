@@ -30,7 +30,7 @@ export default function UpgradeReview({
   }, {});
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       {/* Back */}
       <Button
         startIcon={<ArrowBackIcon />}

@@ -50,7 +50,7 @@ function SubscriptionContent() {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <Container maxWidth="lg" disableGutters>
         {/* Page heading */}
         <Typography variant="h5" sx={{ mb: 3 }}>Subscription management</Typography>
@@ -91,22 +91,6 @@ function SubscriptionContent() {
           </CardContent>
         </Card>
 
-        {/* Tier switch demo buttons */}
-        <Box sx={{ display: 'flex', gap: 1, mb: 3, p: 2, bgcolor: '#F8F9FB', borderRadius: 1, border: '1px dashed #CBD5E1' }}>
-          <Typography variant="caption" sx={{ color: '#64748B', mr: 1, mt: 0.3 }}>Demo — view as tier:</Typography>
-          {TIER_ORDER.map((t) => (
-            <Button
-              key={t}
-              size="small"
-              variant={t === currentTier ? 'contained' : 'outlined'}
-              onClick={() => router.push(`/subscription?tier=${t}`)}
-              sx={{ textTransform: 'capitalize', fontSize: 12, py: 0.3 }}
-            >
-              {t}
-            </Button>
-          ))}
-        </Box>
-
         {/* All tiers */}
         <Typography variant="h6" sx={{ mb: 2 }}>All tiers</Typography>
 
@@ -136,7 +120,7 @@ function SubscriptionContent() {
                           bgcolor: '#F0F7FF',
                           '&::before': {
                             content: '""', position: 'absolute', top: 0, left: 0, right: 0,
-                            height: 3, bgcolor: '#1565C0',
+                            height: 3, bgcolor: 'primary.main',
                           },
                         }),
                       }}
@@ -145,7 +129,7 @@ function SubscriptionContent() {
                         <Chip
                           label="Current tier"
                           size="small"
-                          sx={{ bgcolor: '#1565C0', color: '#fff', fontWeight: 600, fontSize: 11, height: 22, mb: 1 }}
+                          sx={{ bgcolor: 'primary.main', color: '#fff', fontWeight: 600, fontSize: 11, height: 22, mb: 1 }}
                         />
                       )}
                       <Typography variant="caption" sx={{ display: 'block', color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -186,7 +170,7 @@ function SubscriptionContent() {
                           variant="outlined"
                           startIcon={<ArrowUpwardIcon />}
                           onClick={() => router.push(upgradePath)}
-                          sx={{ mt: 1, width: '90%', fontSize: 11, borderColor: '#1565C0', color: '#1565C0' }}
+                          sx={{ mt: 1, width: '90%', fontSize: 11, borderColor: 'primary.main', color: 'primary.main' }}
                         >
                           UPGRADE
                         </Button>

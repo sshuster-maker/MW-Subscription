@@ -1,6 +1,6 @@
 'use client';
 import {
-  AppBar, Box, Chip, Collapse, Drawer, IconButton, List, ListItemButton,
+  AppBar, Box, Chip, Collapse, Drawer, List, ListItemButton,
   ListItemIcon, ListItemText, Toolbar, Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -15,6 +15,7 @@ import SendIcon from '@mui/icons-material/Send';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Logo from './Logo';
 
 const DRAWER_WIDTH = 260;
 
@@ -45,26 +46,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       >
         <Toolbar sx={{ minHeight: '64px !important', px: 3, gap: 2 }}>
           {/* Logo */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 2 }}>
-            <Box
-              sx={{
-                width: 36, height: 36,
-                bgcolor: 'primary.main',
-                borderRadius: '50%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <Typography sx={{ color: '#fff', fontWeight: 800, fontSize: 15, fontStyle: 'italic', fontFamily: '"Poppins", sans-serif' }}>M</Typography>
-            </Box>
-            <Box>
-              <Typography sx={{ fontWeight: 800, fontSize: 16, lineHeight: 1.1, color: 'primary.main', fontFamily: '"Poppins", sans-serif', letterSpacing: '-0.01em' }}>
-                Message<span style={{ color: '#E59A24' }}>W</span>hiz
-              </Typography>
-              <Typography sx={{ fontSize: 8, color: '#9CA3AF', lineHeight: 1, letterSpacing: '0.08em', fontFamily: '"Poppins", sans-serif', textTransform: 'uppercase' }}>
-                Powered by MndSmart
-              </Typography>
-            </Box>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', mr: 2, cursor: 'pointer', flexShrink: 0 }}
+            onClick={() => router.push('/subscription')}
+          >
+            <Logo />
           </Box>
 
           <Box sx={{ flex: 1 }} />
@@ -73,31 +59,32 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <Box
             sx={{
               display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer',
-              color: 'primary.main', px: 1.5, py: 0.75, borderRadius: 1,
-              '&:hover': { bgcolor: 'rgba(21,101,192,0.06)' },
+              px: 1.5, py: 0.75, borderRadius: 1,
+              '&:hover': { bgcolor: 'rgba(41,121,255,0.06)' },
               transition: 'background 0.15s',
             }}
           >
-            <AddIcon fontSize="small" />
-            <Typography sx={{ fontWeight: 600, fontSize: 12, color: 'primary.main', fontFamily: '"Poppins", sans-serif', letterSpacing: '0.05em' }}>
+            <AddIcon fontSize="small" sx={{ color: '#FFA000' }} />
+            <Typography sx={{ fontWeight: 500, fontSize: 13, color: '#FFA000', fontFamily: '"Poppins", sans-serif', letterSpacing: '0.046em' }}>
               ADD CREDIT
             </Typography>
           </Box>
 
           {/* Balance */}
           <Chip
-            icon={<AccountBalanceWalletOutlinedIcon sx={{ fontSize: '16px !important', color: '#E59A24 !important' }} />}
+            icon={<AccountBalanceWalletOutlinedIcon sx={{ fontSize: '18px !important', color: '#663c00 !important' }} />}
             label="My balance $17,503"
-            variant="outlined"
             size="small"
             sx={{
-              borderColor: '#E59A24',
-              color: '#E59A24',
-              fontWeight: 600,
-              fontSize: 12,
+              bgcolor: '#FFF4E5',
+              color: '#663c00',
+              fontWeight: 500,
+              fontSize: 13,
               fontFamily: '"Poppins", sans-serif',
               '& .MuiChip-label': { px: 1 },
-              height: 32,
+              height: 36,
+              borderRadius: 1,
+              border: 'none',
             }}
           />
         </Toolbar>
@@ -145,8 +132,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 onClick={() => item.label === 'Billing' && setBillingOpen((o) => !o)}
                 sx={{
                   px: 1.5, py: 0.875, mb: 0.25, borderRadius: 1.5,
-                  bgcolor: item.active ? 'rgba(21,101,192,0.08)' : 'transparent',
-                  '&:hover': { bgcolor: 'rgba(21,101,192,0.06)' },
+                  bgcolor: item.active ? 'rgba(41,121,255,0.08)' : 'transparent',
+                  '&:hover': { bgcolor: 'rgba(41,121,255,0.06)' },
                 }}
               >
                 <ListItemIcon sx={{ minWidth: 32, color: item.active ? 'primary.main' : 'text.secondary' }}>
@@ -182,7 +169,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     onClick={() => router.push('/subscription')}
                     sx={{
                       pl: 6, py: 0.75, mb: 0.25, borderRadius: 1.5,
-                      '&:hover': { bgcolor: 'rgba(21,101,192,0.04)' },
+                      '&:hover': { bgcolor: 'rgba(41,121,255,0.04)' },
                     }}
                   >
                     <ListItemText
@@ -223,8 +210,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </Box>
       </Drawer>
 
-      {/* Main content */}
-      <Box component="main" sx={{ flex: 1, ml: `${DRAWER_WIDTH}px`, mt: '64px', minHeight: 'calc(100vh - 64px)' }}>
+      {/* Main content — 24px padding on all sides */}
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          ml: `${DRAWER_WIDTH}px`,
+          mt: '64px',
+          minHeight: 'calc(100vh - 64px)',
+          p: 3,
+        }}
+      >
         {children}
       </Box>
     </Box>

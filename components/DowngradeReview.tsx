@@ -25,7 +25,7 @@ export default function DowngradeReview({ fromTier, toTier, features, effectiveD
   }, {});
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => router.back()}

@@ -56,7 +56,7 @@ export default function CancelPage() {
 
   return (
     <AppShell>
-      <Box sx={{ p: 3 }}>
+      <Box>
         {/* Back button */}
         <Button
           startIcon={<ArrowBackIcon />}
