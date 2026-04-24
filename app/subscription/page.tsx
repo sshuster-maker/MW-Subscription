@@ -1,7 +1,7 @@
 'use client';
 import {
   Box, Button, Card, CardContent, Chip, Divider, Table, TableBody,
-  TableCell, TableHead, TableRow, Typography, Container,
+  TableCell, TableHead, TableRow, Typography,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -51,7 +51,6 @@ function SubscriptionContent() {
 
   return (
     <Box>
-      <Container maxWidth="lg" disableGutters>
         {/* Page heading */}
         <Typography variant="h5" sx={{ mb: 3 }}>Subscription management</Typography>
 
@@ -225,7 +224,6 @@ function SubscriptionContent() {
             </TableBody>
           </Table>
         </Card>
-      </Container>
     </Box>
   );
 }
