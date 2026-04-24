@@ -218,7 +218,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           ml: `${DRAWER_WIDTH}px`,
           mt: '64px',
           minHeight: 'calc(100vh - 64px)',
-          p: 3,
+          pt: 3,
+          pr: 3,
+          pb: 3,
+          pl: 0,
         }}
       >
         {children}
