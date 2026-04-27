@@ -7,7 +7,6 @@ import CheckIcon from '@mui/icons-material/Check';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import AppShell from '@/components/AppShell';
 import { FEATURES, TIER_PRICES, Tier, TIER_LABELS } from '@/lib/tierData';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -118,9 +117,8 @@ function SubscriptionContent() {
                   </Button>
                   <Button
                     size="small"
-                    variant="contained"
+                    variant="outlined"
                     onClick={() => document.getElementById('all-tiers')?.scrollIntoView({ behavior: 'smooth' })}
-                    sx={{ fontSize: 12 }}
                   >
                     CHANGE TIER
                   </Button>
@@ -156,33 +154,32 @@ function SubscriptionContent() {
           </Box>
         ) : (
           <Card sx={{ mb: 3, maxWidth: '50%' }}>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="caption" sx={{ color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
-                CURRENT TIER
+            <CardContent sx={{ p: 2, pb: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1, lineHeight: 2.66 }}>
+                Current tier
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1, mb: 2 }}>
-                <Typography variant="h5">{info.label}</Typography>
-                <Chip label="Active" size="small" sx={{ bgcolor: '#E8F5E9', color: '#2E7D32', fontWeight: 600, fontSize: 11, height: 22 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 500 }}>{info.label}</Typography>
+                <Chip label="Active" size="small" variant="outlined" color="success" />
               </Box>
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, maxWidth: 400, mb: 2 }}>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">Billing</Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>{info.billing}{currentTier !== 'basic' && '/month'}</Typography>
-                </Box>
-                <Box>
-                  <Typography variant="caption" color="text.secondary">Tier period</Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 500 }}>{info.period}</Typography>
-                </Box>
+              <Divider />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="body2">Billing</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>{info.billing}{currentTier !== 'basic' && '/month'}</Typography>
               </Box>
-              <Box sx={{ display: 'flex', gap: 1.5 }}>
-                <Button size="small" variant="text" startIcon={<VisibilityOutlinedIcon />} sx={{ textTransform: 'none', fontSize: 13 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="body2">Tier period</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>{info.period}</Typography>
+              </Box>
+              <Divider />
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Button size="small" variant="text" endIcon={<ExpandMoreIcon />} sx={{ fontSize: 13, px: 0 }}>
                   VIEW LIMITS
                 </Button>
                 <Button
                   size="small"
-                  variant="contained"
+                  variant="outlined"
                   onClick={() => document.getElementById('all-tiers')?.scrollIntoView({ behavior: 'smooth' })}
-                  sx={{ fontSize: 12 }}
                 >
                   CHANGE TIER
                 </Button>
