@@ -14,6 +14,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import SendIcon from '@mui/icons-material/Send';
+import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Logo from './Logo';
@@ -22,10 +23,11 @@ import { BalanceProvider, useBalance } from '@/contexts/BalanceContext';
 const DRAWER_WIDTH = 260;
 
 const navItems = [
-  { label: 'Chats', icon: <ChatOutlinedIcon fontSize="small" /> },
-  { label: 'Analytics', icon: <BarChartOutlinedIcon fontSize="small" /> },
-  { label: 'Database', icon: <StorageOutlinedIcon fontSize="small" /> },
-  { label: 'Workspace', icon: <GroupsOutlinedIcon fontSize="small" /> },
+  { label: 'Chats', icon: <ChatOutlinedIcon fontSize="small" />, path: null },
+  { label: 'Analytics', icon: <BarChartOutlinedIcon fontSize="small" />, path: null },
+  { label: 'Database', icon: <StorageOutlinedIcon fontSize="small" />, path: null },
+  { label: 'Workspace', icon: <GroupsOutlinedIcon fontSize="small" />, path: null },
+  { label: 'Billing', icon: <CreditCardOutlinedIcon fontSize="small" />, path: '/topup' },
 ];
 
 function AppShellInner({ children }: { children: React.ReactNode }) {
@@ -156,6 +158,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => (
             <ListItemButton
               key={item.label}
+              onClick={() => item.path && router.push(item.path)}
               sx={{
                 px: 1.5, py: 0.875, mb: 0.25, borderRadius: 1.5,
                 '&:hover': { bgcolor: 'rgba(41,121,255,0.06)' },
