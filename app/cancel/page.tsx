@@ -162,16 +162,16 @@ export default function CancelPage() {
                 <Button
                   variant="outlined"
                   color="primary"
-                  onClick={() => router.push('/subscription')}
+                  onClick={() => router.push('/subscription?downgraded=true')}
                 >
-                  KEEP PREMIUM
+                  CONFIRM
                 </Button>
                 <Button
                   variant="contained"
-                  color="error"
-                  onClick={() => router.push('/subscription?downgraded=true')}
+                  color="primary"
+                  onClick={() => router.push('/subscription')}
                 >
-                  CONFIRM DOWNGRADE
+                  KEEP PREMIUM
                 </Button>
               </Box>
             </CardContent>
