@@ -35,7 +35,7 @@ export const theme = createTheme({
         root: {
           textTransform: 'uppercase',
           fontWeight: 600,
-          borderRadius: 8,
+          borderRadius: 4,
           boxShadow: 'none',
           '&:hover': { boxShadow: 'none' },
         },
