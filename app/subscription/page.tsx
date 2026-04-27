@@ -116,7 +116,12 @@ function SubscriptionContent() {
                   <Button size="small" variant="text" endIcon={<ExpandMoreIcon />} sx={{ fontSize: 13, px: 0 }}>
                     VIEW LIMITS
                   </Button>
-                  <Button size="small" variant="contained" onClick={() => router.push('/subscription')} sx={{ fontSize: 12 }}>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={() => document.getElementById('all-tiers')?.scrollIntoView({ behavior: 'smooth' })}
+                    sx={{ fontSize: 12 }}
+                  >
                     CHANGE TIER
                   </Button>
                 </Box>
@@ -176,7 +181,7 @@ function SubscriptionContent() {
                 <Button
                   size="small"
                   variant="contained"
-                  onClick={() => router.push(`/subscription?tier=${currentTier}`)}
+                  onClick={() => document.getElementById('all-tiers')?.scrollIntoView({ behavior: 'smooth' })}
                   sx={{ fontSize: 12 }}
                 >
                   CHANGE TIER
@@ -187,7 +192,7 @@ function SubscriptionContent() {
         )}
 
         {/* All tiers */}
-        <Typography variant="h6" sx={{ mb: 2 }}>All tiers</Typography>
+        <Typography id="all-tiers" variant="h6" sx={{ mb: 2 }}>All tiers</Typography>
 
         <Card sx={{ overflow: 'visible' }}>
           <Table>
