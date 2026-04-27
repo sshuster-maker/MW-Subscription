@@ -1,11 +1,14 @@
 'use client';
 import {
-  Box, Button, Card, CardContent, Divider, Typography,
+  Box, Button, Card, CardContent, Dialog, DialogActions, DialogContent,
+  DialogTitle, Divider, Typography,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import FeatureChip from './FeatureChip';
 import type { UpgradeFeature } from '@/lib/tierData';
+import { useBalance } from '@/contexts/BalanceContext';
 
 interface Props {
   fromTier: string;
@@ -21,6 +24,8 @@ export default function UpgradeReview({
   fromTier, toTier, features, priceNow, priceNext, nextBillingDate, proratedNote,
 }: Props) {
   const router = useRouter();
+  const { lowBalance } = useBalance();
+  const [insufficientOpen, setInsufficientOpen] = useState(false);
 
   // Group features by category
   const grouped = features.reduce<Record<string, UpgradeFeature[]>>((acc, f) => {
@@ -28,6 +33,16 @@ export default function UpgradeReview({
     acc[f.category].push(f);
     return acc;
   }, {});
+
+  const handleConfirm = () => {
+    if (lowBalance) {
+      setInsufficientOpen(true);
+    } else {
+      router.push(
+        `/upgrade/success?tier=${toTier.toLowerCase()}&charged=${encodeURIComponent(priceNow)}&nextCharge=${encodeURIComponent(priceNext)}&nextDate=${encodeURIComponent(nextBillingDate)}`
+      );
+    }
+  };
 
   return (
     <Box>
@@ -100,17 +115,42 @@ export default function UpgradeReview({
             <Button variant="outlined" onClick={() => router.back()} sx={{ color: '#5C6370', borderColor: '#D1D5DB' }}>
               KEEP {fromTier.toUpperCase()}
             </Button>
-            <Button
-              variant="contained"
-              onClick={() => router.push(
-        `/upgrade/success?tier=${toTier.toLowerCase()}&charged=${encodeURIComponent(priceNow)}&nextCharge=${encodeURIComponent(priceNext)}&nextDate=${encodeURIComponent(nextBillingDate)}`
-      )}
-            >
+            <Button variant="contained" onClick={handleConfirm}>
               CONFIRM
             </Button>
           </Box>
         </CardContent>
       </Card>
+
+      {/* Insufficient balance dialog */}
+      <Dialog open={insufficientOpen} onClose={() => setInsufficientOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontFamily: '"Poppins", sans-serif', fontWeight: 600 }}>
+          Insufficient balance
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ fontFamily: '"Poppins", sans-serif' }}>
+            Your balance is $23.00. You need {priceNow} to activate this tier.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+          <Button
+            variant="text"
+            color="primary"
+            onClick={() => setInsufficientOpen(false)}
+            sx={{ fontFamily: '"Poppins", sans-serif' }}
+          >
+            CANCEL
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => router.push('/topup')}
+            sx={{ fontFamily: '"Poppins", sans-serif' }}
+          >
+            ADD CREDIT
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

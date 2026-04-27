@@ -2,7 +2,7 @@
 import {
   AppBar, Avatar, Box, Chip, Collapse, Divider, Drawer, List,
   ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem,
-  Toolbar, Typography,
+  Switch, Toolbar, Tooltip, Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
@@ -17,6 +17,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Logo from './Logo';
+import { BalanceProvider, useBalance } from '@/contexts/BalanceContext';
 
 const DRAWER_WIDTH = 260;
 
@@ -27,9 +28,10 @@ const navItems = [
   { label: 'Workspace', icon: <GroupsOutlinedIcon fontSize="small" /> },
 ];
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+function AppShellInner({ children }: { children: React.ReactNode }) {
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const router = useRouter();
+  const { lowBalance, toggleLowBalance } = useBalance();
 
   const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
     setMenuAnchor(e.currentTarget);
@@ -82,12 +84,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* Balance */}
           <Chip
-            icon={<AccountBalanceWalletOutlinedIcon sx={{ fontSize: '18px !important', color: '#663c00 !important' }} />}
-            label="My balance $17,503"
+            icon={<AccountBalanceWalletOutlinedIcon sx={{ fontSize: '18px !important', color: lowBalance ? '#C62828 !important' : '#663c00 !important' }} />}
+            label={lowBalance ? 'My balance $23.00' : 'My balance $17,503'}
             size="small"
             sx={{
-              bgcolor: '#FFF4E5',
-              color: '#663c00',
+              bgcolor: lowBalance ? '#FFEBEE' : '#FFF4E5',
+              color: lowBalance ? '#C62828' : '#663c00',
               fontWeight: 500,
               fontSize: 13,
               fontFamily: '"Poppins", sans-serif',
@@ -97,6 +99,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               border: 'none',
             }}
           />
+
+          {/* Low-balance demo toggle */}
+          <Tooltip title={lowBalance ? 'Switch to sufficient balance' : 'Simulate insufficient balance'} arrow>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 0.5 }}>
+              <Typography sx={{ fontSize: 11, color: 'text.secondary', fontFamily: '"Poppins", sans-serif', whiteSpace: 'nowrap' }}>
+                Low $
+              </Typography>
+              <Switch
+                size="small"
+                checked={lowBalance}
+                onChange={toggleLowBalance}
+                color="error"
+              />
+            </Box>
+          </Tooltip>
         </Toolbar>
       </AppBar>
 
@@ -301,5 +318,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </Box>
     </Box>
+  );
+}
+
+export default function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <BalanceProvider>
+      <AppShellInner>{children}</AppShellInner>
+    </BalanceProvider>
   );
 }
