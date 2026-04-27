@@ -215,7 +215,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         component="main"
         sx={{
           flex: 1,
-          ml: `${DRAWER_WIDTH}px`,
+          ml: 0,
           mt: '64px',
           minHeight: 'calc(100vh - 64px)',
           pt: 3,
