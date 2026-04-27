@@ -218,10 +218,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           ml: 0,
           mt: '64px',
           minHeight: 'calc(100vh - 64px)',
-          pt: 3,
-          pr: 3,
-          pb: 3,
-          pl: 0,
+          p: 3,
         }}
       >
         {children}
