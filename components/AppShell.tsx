@@ -143,7 +143,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
           <Box
             sx={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1,
-              bgcolor: 'primary.main', color: '#fff', borderRadius: 1.5, py: 1.25, cursor: 'pointer',
+              bgcolor: 'primary.main', color: '#fff', borderRadius: '4px', py: 1.25, cursor: 'pointer',
               fontWeight: 700, fontSize: 13, fontFamily: '"Poppins", sans-serif', letterSpacing: '0.08em',
               '&:hover': { bgcolor: 'primary.dark' },
               transition: 'background 0.15s',
