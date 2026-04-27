@@ -155,7 +155,7 @@ function SubscriptionContent() {
             </Card>
           </Box>
         ) : (
-          <Card sx={{ mb: 3 }}>
+          <Card sx={{ mb: 3, maxWidth: '50%' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="caption" sx={{ color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
                 CURRENT TIER
