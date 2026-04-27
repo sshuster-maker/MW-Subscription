@@ -6,6 +6,7 @@ import {
 import CheckIcon from '@mui/icons-material/Check';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import AppShell from '@/components/AppShell';
 import { FEATURES, TIER_PRICES, Tier, TIER_LABELS } from '@/lib/tierData';
@@ -21,9 +22,12 @@ function SubscriptionContent() {
   const downgraded = params.get('downgraded') === 'true';
   const upgraded = params.get('upgraded') === 'true';
   const [toastOpen, setToastOpen] = useState(downgraded || upgraded);
+  // Persists the two-card layout even after the URL param is cleared
+  const [showScheduled, setShowScheduled] = useState(downgraded);
 
   useEffect(() => {
     if (downgraded || upgraded) setToastOpen(true);
+    if (downgraded) setShowScheduled(true);
   }, [downgraded, upgraded]);
 
   const currentIdx = TIER_ORDER.indexOf(currentTier);
@@ -85,41 +89,102 @@ function SubscriptionContent() {
         {/* Page heading */}
         <Typography variant="h5" sx={{ mb: 3 }}>Subscription management</Typography>
 
-        {/* Current tier card */}
-        <Card sx={{ mb: 3 }}>
-          <CardContent sx={{ p: 3 }}>
-            <Typography variant="caption" sx={{ color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
-              CURRENT TIER
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1, mb: 2 }}>
-              <Typography variant="h5">{info.label}</Typography>
-              <Chip label="Active" size="small" sx={{ bgcolor: '#E8F5E9', color: '#2E7D32', fontWeight: 600, fontSize: 11, height: 22 }} />
-            </Box>
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, maxWidth: 400, mb: 2 }}>
-              <Box>
-                <Typography variant="caption" color="text.secondary">Billing</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>{info.billing}{currentTier !== 'basic' && '/month'}</Typography>
+        {/* Current tier card — two cards when downgrade is scheduled */}
+        {showScheduled ? (
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 3 }}>
+            {/* Left: current active tier */}
+            <Card>
+              <CardContent sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1, lineHeight: 2.66 }}>
+                  Current tier
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 500 }}>Premium</Typography>
+                  <Chip label="Active" size="small" variant="outlined" color="success" />
+                </Box>
+                <Divider />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2">Billing</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>$114</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2">Tier period</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>1 – 30 Apr 2026</Typography>
+                </Box>
+                <Divider />
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Button size="small" variant="text" endIcon={<ExpandMoreIcon />} sx={{ fontSize: 13, px: 0 }}>
+                    VIEW LIMITS
+                  </Button>
+                  <Button size="small" variant="contained" onClick={() => router.push('/subscription')} sx={{ fontSize: 12 }}>
+                    CHANGE TIER
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* Right: scheduled future tier */}
+            <Card>
+              <CardContent sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1, lineHeight: 2.66 }}>
+                  Scheduled tier
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 500 }}>Basic</Typography>
+                  <Chip label="Scheduled" size="small" variant="outlined" color="warning" />
+                </Box>
+                <Divider />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2">Billing</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>Free</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="body2">Tier period</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>1 – 31 May 2026</Typography>
+                </Box>
+                <Divider />
+                <Button size="small" variant="text" endIcon={<ExpandMoreIcon />} sx={{ fontSize: 13, px: 0, alignSelf: 'flex-start' }}>
+                  VIEW LIMITS
+                </Button>
+              </CardContent>
+            </Card>
+          </Box>
+        ) : (
+          <Card sx={{ mb: 3 }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="caption" sx={{ color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
+                CURRENT TIER
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1, mb: 2 }}>
+                <Typography variant="h5">{info.label}</Typography>
+                <Chip label="Active" size="small" sx={{ bgcolor: '#E8F5E9', color: '#2E7D32', fontWeight: 600, fontSize: 11, height: 22 }} />
               </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">Tier period</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>{info.period}</Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, maxWidth: 400, mb: 2 }}>
+                <Box>
+                  <Typography variant="caption" color="text.secondary">Billing</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>{info.billing}{currentTier !== 'basic' && '/month'}</Typography>
+                </Box>
+                <Box>
+                  <Typography variant="caption" color="text.secondary">Tier period</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>{info.period}</Typography>
+                </Box>
               </Box>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1.5 }}>
-              <Button size="small" variant="text" startIcon={<VisibilityOutlinedIcon />} sx={{ textTransform: 'none', fontSize: 13 }}>
-                VIEW LIMITS
-              </Button>
-              <Button
-                size="small"
-                variant="contained"
-                onClick={() => router.push(`/subscription?tier=${currentTier}`)}
-                sx={{ fontSize: 12 }}
-              >
-                CHANGE TIER
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
+              <Box sx={{ display: 'flex', gap: 1.5 }}>
+                <Button size="small" variant="text" startIcon={<VisibilityOutlinedIcon />} sx={{ textTransform: 'none', fontSize: 13 }}>
+                  VIEW LIMITS
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={() => router.push(`/subscription?tier=${currentTier}`)}
+                  sx={{ fontSize: 12 }}
+                >
+                  CHANGE TIER
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        )}
 
         {/* All tiers */}
         <Typography variant="h6" sx={{ mb: 2 }}>All tiers</Typography>
