@@ -1,16 +1,16 @@
 'use client';
 import {
-  Box, Button, Card, CardContent, Chip, Divider, Table, TableBody,
-  TableCell, TableHead, TableRow, Typography,
+  Alert, Box, Button, Card, CardContent, Chip, Divider, Snackbar,
+  Table, TableBody, TableCell, TableHead, TableRow, Typography,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import AppShell from '@/components/AppShell';
-import { FEATURES, TIER_PRICES, Tier } from '@/lib/tierData';
+import { FEATURES, TIER_PRICES, Tier, TIER_LABELS } from '@/lib/tierData';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 const TIER_ORDER: Tier[] = ['basic', 'premium', 'enterprise'];
 
@@ -18,6 +18,13 @@ function SubscriptionContent() {
   const router = useRouter();
   const params = useSearchParams();
   const currentTier = (params.get('tier') as Tier) || 'premium';
+  const downgraded = params.get('downgraded') === 'true';
+  const upgraded = params.get('upgraded') === 'true';
+  const [toastOpen, setToastOpen] = useState(downgraded || upgraded);
+
+  useEffect(() => {
+    if (downgraded || upgraded) setToastOpen(true);
+  }, [downgraded, upgraded]);
 
   const currentIdx = TIER_ORDER.indexOf(currentTier);
 
@@ -51,6 +58,30 @@ function SubscriptionContent() {
 
   return (
     <Box>
+        {/* Toast notifications */}
+        <Snackbar
+          open={toastOpen}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          onClose={() => {
+            setToastOpen(false);
+            router.replace('/subscription' + (currentTier !== 'premium' ? `?tier=${currentTier}` : ''));
+          }}
+        >
+          <Alert
+            severity="success"
+            onClose={() => {
+              setToastOpen(false);
+              router.replace('/subscription' + (currentTier !== 'premium' ? `?tier=${currentTier}` : ''));
+            }}
+            sx={{ width: '100%' }}
+          >
+            {downgraded
+              ? 'Downgrade scheduled. Your plan changes on 1 May 2026.'
+              : `Upgrade successful! You now have access to ${TIER_LABELS[currentTier]} features.`}
+          </Alert>
+        </Snackbar>
+
         {/* Page heading */}
         <Typography variant="h5" sx={{ mb: 3 }}>Subscription management</Typography>
 

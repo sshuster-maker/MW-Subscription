@@ -102,7 +102,7 @@ export default function UpgradeReview({
             </Button>
             <Button
               variant="contained"
-              onClick={() => router.push('/subscription?tier=' + toTier.toLowerCase())}
+              onClick={() => router.push('/subscription?tier=' + toTier.toLowerCase() + '&upgraded=true')}
             >
               CONFIRM
             </Button>
