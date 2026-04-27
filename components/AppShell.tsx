@@ -1,7 +1,8 @@
 'use client';
 import {
-  AppBar, Box, Chip, Collapse, Drawer, List, ListItemButton,
-  ListItemIcon, ListItemText, Toolbar, Typography,
+  AppBar, Avatar, Box, Chip, Collapse, Divider, Drawer, List,
+  ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem,
+  Toolbar, Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
@@ -9,10 +10,10 @@ import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
-import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import SendIcon from '@mui/icons-material/Send';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import LogoutIcon from '@mui/icons-material/Logout';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import SendIcon from '@mui/icons-material/Send';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Logo from './Logo';
@@ -24,12 +25,21 @@ const navItems = [
   { label: 'Analytics', icon: <BarChartOutlinedIcon fontSize="small" /> },
   { label: 'Database', icon: <StorageOutlinedIcon fontSize="small" /> },
   { label: 'Workspace', icon: <GroupsOutlinedIcon fontSize="small" /> },
-  { label: 'Billing', icon: <CreditCardOutlinedIcon fontSize="small" />, active: true },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const [billingOpen, setBillingOpen] = useState(true);
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const router = useRouter();
+
+  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchor(e.currentTarget);
+  };
+  const handleMenuClose = () => setMenuAnchor(null);
+
+  const navigate = (path: string) => {
+    handleMenuClose();
+    router.push(path);
+  };
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -127,68 +137,45 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <List dense disablePadding sx={{ px: 0.5 }}>
           {navItems.map((item) => (
-            <Box key={item.label}>
-              <ListItemButton
-                onClick={() => item.label === 'Billing' && setBillingOpen((o) => !o)}
-                sx={{
-                  px: 1.5, py: 0.875, mb: 0.25, borderRadius: 1.5,
-                  bgcolor: item.active ? 'rgba(41,121,255,0.08)' : 'transparent',
-                  '&:hover': { bgcolor: 'rgba(41,121,255,0.06)' },
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 32, color: item.active ? 'primary.main' : 'text.secondary' }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  slotProps={{
-                    primary: {
-                      sx: {
-                        fontSize: 13.5,
-                        fontWeight: item.active ? 600 : 400,
-                        color: item.active ? 'primary.main' : 'text.primary',
-                        fontFamily: '"Poppins", sans-serif',
-                      },
+            <ListItemButton
+              key={item.label}
+              sx={{
+                px: 1.5, py: 0.875, mb: 0.25, borderRadius: 1.5,
+                '&:hover': { bgcolor: 'rgba(41,121,255,0.06)' },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 32, color: 'text.secondary' }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={item.label}
+                slotProps={{
+                  primary: {
+                    sx: {
+                      fontSize: 13.5,
+                      fontWeight: 400,
+                      color: 'text.primary',
+                      fontFamily: '"Poppins", sans-serif',
                     },
-                  }}
-                />
-                {item.label === 'Billing' && (
-                  <ExpandMoreIcon
-                    sx={{
-                      fontSize: 18, color: 'text.secondary',
-                      transform: billingOpen ? 'rotate(180deg)' : 'rotate(0)',
-                      transition: 'transform 0.2s',
-                    }}
-                  />
-                )}
-              </ListItemButton>
-
-              {item.label === 'Billing' && (
-                <Collapse in={billingOpen}>
-                  <ListItemButton
-                    onClick={() => router.push('/subscription')}
-                    sx={{
-                      pl: 6, py: 0.75, mb: 0.25, borderRadius: 1.5,
-                      '&:hover': { bgcolor: 'rgba(41,121,255,0.04)' },
-                    }}
-                  >
-                    <ListItemText
-                      primary="Subscription"
-                      slotProps={{
-                        primary: {
-                          sx: { fontSize: 13, color: 'primary.main', fontWeight: 500, fontFamily: '"Poppins", sans-serif' },
-                        },
-                      }}
-                    />
-                  </ListItemButton>
-                </Collapse>
-              )}
-            </Box>
+                  },
+                }}
+              />
+            </ListItemButton>
           ))}
         </List>
 
-        {/* Bottom user */}
-        <Box sx={{ mt: 'auto', px: 1.5, py: 1, display: 'flex', alignItems: 'center', gap: 1.5, borderTop: '1px solid #F1F5F9' }}>
+        {/* Bottom user — click to open My Account menu */}
+        <Box
+          onClick={handleMenuOpen}
+          sx={{
+            mt: 'auto', px: 1.5, py: 1,
+            display: 'flex', alignItems: 'center', gap: 1.5,
+            borderTop: '1px solid #F1F5F9',
+            cursor: 'pointer', borderRadius: 1,
+            '&:hover': { bgcolor: 'rgba(41,121,255,0.04)' },
+            transition: 'background 0.15s',
+          }}
+        >
           <Box
             sx={{
               width: 34, height: 34, borderRadius: '50%',
@@ -210,7 +197,97 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </Box>
       </Drawer>
 
-      {/* Main content — 24px padding on all sides */}
+      {/* My Account dropdown menu */}
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={handleMenuClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        slotProps={{
+          paper: {
+            elevation: 2,
+            sx: { width: 280, borderRadius: 1 },
+          },
+        }}
+      >
+        {/* User info header */}
+        <Box sx={{ px: 2, pt: 1, pb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1 }}>
+            <Avatar sx={{ width: 40, height: 40, bgcolor: 'secondary.main', flexShrink: 0 }}>
+              <PersonOutlinedIcon sx={{ fontSize: 22 }} />
+            </Avatar>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography sx={{ fontSize: 14, color: 'text.primary', fontFamily: '"Poppins", sans-serif', lineHeight: 1.43, letterSpacing: '0.17px' }}>
+                alexndrashus@gmail.com
+              </Typography>
+              <Typography sx={{ fontSize: 14, color: 'text.secondary', fontFamily: '"Poppins", sans-serif', lineHeight: 1.43, letterSpacing: '0.17px' }}>
+                alexndrashus-2659
+              </Typography>
+            </Box>
+          </Box>
+          <Box sx={{ bgcolor: '#EFF8FF', borderRadius: 1, px: 1, py: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography sx={{ fontSize: 14, fontFamily: '"Poppins", sans-serif', color: 'text.primary' }}>
+              Tier
+            </Typography>
+            <Chip
+              label="Premium"
+              size="small"
+              sx={{
+                bgcolor: 'rgba(2,11,34,0.08)',
+                color: 'text.primary',
+                fontSize: 13,
+                fontFamily: '"Poppins", sans-serif',
+                height: 24,
+                borderRadius: '100px',
+              }}
+            />
+          </Box>
+        </Box>
+
+        <Divider />
+
+        <MenuItem onClick={() => navigate('/account')} sx={{ py: 1.5, fontFamily: '"Poppins", sans-serif', fontSize: 16 }}>
+          Account
+        </MenuItem>
+        <MenuItem onClick={() => navigate('/users')} sx={{ py: 1.5, fontFamily: '"Poppins", sans-serif', fontSize: 16 }}>
+          Users management
+        </MenuItem>
+        <MenuItem
+          onClick={() => navigate('/subscription')}
+          sx={{
+            py: 1.5,
+            fontFamily: '"Poppins", sans-serif',
+            fontSize: 16,
+            bgcolor: 'rgba(41,121,255,0.04)',
+            '&:hover': { bgcolor: 'rgba(41,121,255,0.08)' },
+          }}
+        >
+          Subscription management
+        </MenuItem>
+        <MenuItem onClick={() => navigate('/teams')} sx={{ py: 1.5, fontFamily: '"Poppins", sans-serif', fontSize: 16 }}>
+          Teams management
+        </MenuItem>
+        <MenuItem onClick={() => navigate('/roles')} sx={{ py: 1.5, fontFamily: '"Poppins", sans-serif', fontSize: 16 }}>
+          Roles management
+        </MenuItem>
+        <MenuItem onClick={() => navigate('/settings')} sx={{ py: 1.5, fontFamily: '"Poppins", sans-serif', fontSize: 16 }}>
+          Settings
+        </MenuItem>
+
+        <Divider />
+
+        <MenuItem onClick={handleMenuClose} sx={{ py: 1.5, display: 'flex', justifyContent: 'space-between', fontFamily: '"Poppins", sans-serif', fontSize: 16 }}>
+          Switch team
+          <ChevronRightIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose} sx={{ py: 1.5, gap: 1.5, fontFamily: '"Poppins", sans-serif', fontSize: 16 }}>
+          <LogoutIcon sx={{ fontSize: 20, color: 'text.primary' }} />
+          Logout
+        </MenuItem>
+      </Menu>
+
+      {/* Main content */}
       <Box
         component="main"
         sx={{
