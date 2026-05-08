@@ -1,12 +1,14 @@
 'use client';
 import {
-  Alert, Box, Button, Card, CardContent, Chip, Divider, Snackbar,
-  Table, TableBody, TableCell, TableHead, TableRow, Typography,
+  Alert, Box, Button, Card, CardContent, Chip, Collapse, Dialog, DialogActions,
+  DialogContent, DialogContentText, DialogTitle, Divider, MenuItem,
+  Select, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, Typography,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import AppShell from '@/components/AppShell';
 import { FEATURES, TIER_PRICES, Tier, TIER_LABELS } from '@/lib/tierData';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -20,16 +22,38 @@ function SubscriptionContent() {
   const currentTier = (params.get('tier') as Tier) || 'premium';
   const downgraded = params.get('downgraded') === 'true';
   const upgraded = params.get('upgraded') === 'true';
-  const [toastOpen, setToastOpen] = useState(downgraded || upgraded);
+  const scheduleCancelled = params.get('schedule_cancelled') === 'true';
+  const [toastOpen, setToastOpen] = useState(downgraded || upgraded || scheduleCancelled);
   // Persists the two-card layout even after the URL param is cleared
   const [showScheduled, setShowScheduled] = useState(downgraded);
 
   useEffect(() => {
-    if (downgraded || upgraded) setToastOpen(true);
+    if (downgraded || upgraded || scheduleCancelled) setToastOpen(true);
     if (downgraded) setShowScheduled(true);
-  }, [downgraded, upgraded]);
+  }, [downgraded, upgraded, scheduleCancelled]);
 
   const currentIdx = TIER_ORDER.indexOf(currentTier);
+
+  const vParam = params.get('v') === '2' ? 'v2' : 'v1';
+  const [version, setVersion] = useState<'v1' | 'v2'>(vParam);
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+  const [currentLimitsOpen, setCurrentLimitsOpen] = useState(false);
+  const [scheduledLimitsOpen, setScheduledLimitsOpen] = useState(false);
+
+  const TIER_LIMITS: Record<Tier, { label: string; value: string }[]> = {
+    basic:      [{ label: 'Call Center agents', value: '5' }, { label: 'Users per account', value: '5' }],
+    premium:    [{ label: 'WhatsApp limit', value: '12/20 000' }, { label: 'Email limit', value: '10/20 000' }, { label: 'Viber balance', value: '$20/200' }, { label: 'Users per account', value: '5/25' }],
+    enterprise: [{ label: 'WhatsApp limit', value: '30/50 000' }, { label: 'Email limit', value: '25/50 000' }, { label: 'Viber balance', value: '$50/500' }, { label: 'Users per account', value: '12/50' }],
+  };
+
+  function handleVersionChange(v: 'v1' | 'v2') {
+    setVersion(v);
+    const sp = new URLSearchParams();
+    if (currentTier !== 'premium') sp.set('tier', currentTier);
+    if (v === 'v2') sp.set('v', '2');
+    const q = sp.toString();
+    router.replace('/subscription' + (q ? `?${q}` : ''));
+  }
 
   const TIER_INFO = {
     basic: { label: 'Basic', price: 'Free', period: '1 – 31 Mar 2026', billing: 'Free' },
@@ -68,25 +92,48 @@ function SubscriptionContent() {
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           onClose={() => {
             setToastOpen(false);
-            router.replace('/subscription' + (currentTier !== 'premium' ? `?tier=${currentTier}` : ''));
+            const sp = new URLSearchParams();
+            if (currentTier !== 'premium') sp.set('tier', currentTier);
+            if (version === 'v2') sp.set('v', '2');
+            const q = sp.toString();
+            router.replace('/subscription' + (q ? `?${q}` : ''));
           }}
         >
           <Alert
             severity="success"
             onClose={() => {
               setToastOpen(false);
-              router.replace('/subscription' + (currentTier !== 'premium' ? `?tier=${currentTier}` : ''));
+              const sp = new URLSearchParams();
+              if (currentTier !== 'premium') sp.set('tier', currentTier);
+              if (version === 'v2') sp.set('v', '2');
+              const q = sp.toString();
+              router.replace('/subscription' + (q ? `?${q}` : ''));
             }}
             sx={{ width: '100%' }}
           >
-            {downgraded
-              ? 'Downgrade scheduled. Your plan changes on 1 May 2026.'
-              : `Upgrade successful! You now have access to ${TIER_LABELS[currentTier]} features.`}
+            {scheduleCancelled
+              ? 'Your cancellation has been reversed. Your current plan remains active.'
+              : downgraded
+                ? (version === 'v2'
+                    ? 'Cancellation scheduled. Your plan changes on 1 May 2026.'
+                    : 'Downgrade scheduled. Your plan changes on 1 May 2026.')
+                : `Upgrade successful! You now have access to ${TIER_LABELS[currentTier]} features.`}
           </Alert>
         </Snackbar>
 
         {/* Page heading */}
-        <Typography variant="h5" sx={{ mb: 3 }}>Subscription management</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Typography variant="h5">Subscription management</Typography>
+          <Select
+            size="small"
+            value={version}
+            onChange={(e) => handleVersionChange(e.target.value as 'v1' | 'v2')}
+            sx={{ minWidth: 180 }}
+          >
+            <MenuItem value="v1">Version 1 (current)</MenuItem>
+            <MenuItem value="v2">Version 2 (new)</MenuItem>
+          </Select>
+        </Box>
 
         {/* Current tier card — two cards when downgrade is scheduled */}
         {showScheduled ? (
@@ -112,17 +159,31 @@ function SubscriptionContent() {
                 </Box>
                 <Divider />
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Button size="small" variant="text" endIcon={<ExpandMoreIcon />} sx={{ fontSize: 13, px: 0 }}>
-                    VIEW LIMITS
-                  </Button>
                   <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => document.getElementById('all-tiers')?.scrollIntoView({ behavior: 'smooth' })}
+                    size="small" variant="text"
+                    endIcon={currentLimitsOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    sx={{ fontSize: 13, px: 0 }}
+                    onClick={() => setCurrentLimitsOpen(v => !v)}
                   >
-                    CHANGE TIER
+                    {currentLimitsOpen ? 'HIDE LIMITS' : 'VIEW LIMITS'}
                   </Button>
+                  {version === 'v1' && (
+                    <Button size="small" variant="outlined"
+                      onClick={() => document.getElementById('all-tiers')?.scrollIntoView({ behavior: 'smooth' })}>
+                      CHANGE TIER
+                    </Button>
+                  )}
                 </Box>
+                <Collapse in={currentLimitsOpen}>
+                  <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+                    {TIER_LIMITS['premium'].map((item) => (
+                      <Box key={item.label} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2">{item.label}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{item.value}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Collapse>
               </CardContent>
             </Card>
 
@@ -146,9 +207,29 @@ function SubscriptionContent() {
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>1 – 31 May 2026</Typography>
                 </Box>
                 <Divider />
-                <Button size="small" variant="text" endIcon={<ExpandMoreIcon />} sx={{ fontSize: 13, px: 0, alignSelf: 'flex-start' }}>
-                  VIEW LIMITS
-                </Button>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Button
+                    size="small" variant="text"
+                    endIcon={scheduledLimitsOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    sx={{ fontSize: 13, px: 0 }}
+                    onClick={() => setScheduledLimitsOpen(v => !v)}
+                  >
+                    {scheduledLimitsOpen ? 'HIDE LIMITS' : 'VIEW LIMITS'}
+                  </Button>
+                  <Button size="small" variant="outlined" color="error" onClick={() => setConfirmCancelOpen(true)}>
+                    CANCEL
+                  </Button>
+                </Box>
+                <Collapse in={scheduledLimitsOpen}>
+                  <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+                    {TIER_LIMITS['basic'].map((item) => (
+                      <Box key={item.label} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2">{item.label}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{item.value}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Collapse>
               </CardContent>
             </Card>
           </Box>
@@ -173,17 +254,35 @@ function SubscriptionContent() {
               </Box>
               <Divider />
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Button size="small" variant="text" endIcon={<ExpandMoreIcon />} sx={{ fontSize: 13, px: 0 }}>
-                  VIEW LIMITS
-                </Button>
                 <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() => document.getElementById('all-tiers')?.scrollIntoView({ behavior: 'smooth' })}
+                  size="small" variant="text"
+                  endIcon={currentLimitsOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  sx={{ fontSize: 13, px: 0 }}
+                  onClick={() => setCurrentLimitsOpen(v => !v)}
                 >
-                  CHANGE TIER
+                  {currentLimitsOpen ? 'HIDE LIMITS' : 'VIEW LIMITS'}
                 </Button>
+                {version === 'v1' ? (
+                  <Button size="small" variant="outlined"
+                    onClick={() => document.getElementById('all-tiers')?.scrollIntoView({ behavior: 'smooth' })}>
+                    CHANGE TIER
+                  </Button>
+                ) : (
+                  <Button size="small" variant="outlined" color="error" onClick={() => router.push('/cancel?v=2')}>
+                    CANCEL
+                  </Button>
+                )}
               </Box>
+              <Collapse in={currentLimitsOpen}>
+                <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+                  {TIER_LIMITS[currentTier].map((item) => (
+                    <Box key={item.label} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2">{item.label}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>{item.value}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Collapse>
             </CardContent>
           </Card>
         )}
@@ -246,7 +345,7 @@ function SubscriptionContent() {
                         )}
                       </Typography>
 
-                      {canDowngrade && downgradePath && (
+                      {version === 'v1' && canDowngrade && downgradePath && (
                         <Button
                           size="small"
                           variant="outlined"
@@ -322,6 +421,34 @@ function SubscriptionContent() {
             </TableBody>
           </Table>
         </Card>
+
+        {/* Confirm cancel-schedule dialog */}
+        <Dialog open={confirmCancelOpen} onClose={() => setConfirmCancelOpen(false)} maxWidth="xs" fullWidth>
+          <DialogTitle>Cancel scheduled change?</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to cancel the scheduled plan change? Your current plan will remain active.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmCancelOpen(false)}>GO BACK</Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                setConfirmCancelOpen(false);
+                setShowScheduled(false);
+                const sp = new URLSearchParams();
+                if (currentTier !== 'premium') sp.set('tier', currentTier);
+                sp.set('schedule_cancelled', 'true');
+                if (version === 'v2') sp.set('v', '2');
+                router.push('/subscription?' + sp.toString());
+              }}
+            >
+              CONFIRM
+            </Button>
+          </DialogActions>
+        </Dialog>
     </Box>
   );
 }

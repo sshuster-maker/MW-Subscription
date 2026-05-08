@@ -4,8 +4,8 @@ import {
   IconButton, TextField, Typography,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import AppShell from '@/components/AppShell';
 import FeatureChip from '@/components/FeatureChip';
 import { DOWNGRADE_TO_BASIC } from '@/lib/tierData';
@@ -19,8 +19,10 @@ const REASONS = [
   { id: 'other', label: 'Other', desc: 'Something else not listed above' },
 ];
 
-export default function CancelPage() {
+function CancelContent() {
   const router = useRouter();
+  const params = useSearchParams();
+  const isV2 = params.get('v') === '2';
   const [step, setStep] = useState<1 | 2>(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [comment, setComment] = useState('');
@@ -40,8 +42,7 @@ export default function CancelPage() {
   }, {});
 
   return (
-    <AppShell>
-      <Box>
+    <Box>
         {/* Page heading */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
           <IconButton
@@ -57,7 +58,7 @@ export default function CancelPage() {
         {step === 1 && (
           <Card sx={{ maxWidth: 600, mx: 'auto', borderRadius: 1 }}>
             <CardContent sx={{ p: 2 }}>
-              <Typography variant="h6" sx={{ mb: 0.5 }}>Why are you downgrading?</Typography>
+              <Typography variant="h6" sx={{ mb: 0.5 }}>{isV2 ? 'Why are you canceling?' : 'Why are you downgrading?'}</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 Your feedback helps us improve. Select all that apply.
               </Typography>
@@ -100,9 +101,9 @@ export default function CancelPage() {
                 <Button
                   variant="outlined"
                   color="primary"
-                  onClick={() => router.push('/subscription')}
+                  onClick={() => router.push(isV2 ? '/subscription?v=2' : '/subscription')}
                 >
-                  KEEP PREMIUM
+                  {isV2 ? 'KEEP PLAN' : 'KEEP PREMIUM'}
                 </Button>
                 <Button
                   variant="contained"
@@ -120,12 +121,17 @@ export default function CancelPage() {
         {step === 2 && (
           <Card sx={{ maxWidth: 600, mx: 'auto', borderRadius: 1 }}>
             <CardContent sx={{ p: 2 }}>
-              <Typography variant="h6" sx={{ mb: 0.5 }}>Downgrade subscription</Typography>
+              <Typography variant="h6" sx={{ mb: 0.5 }}>{isV2 ? 'Cancel subscription' : 'Downgrade subscription'}</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                You&apos;re downgrading from Premium to Basic. Here&apos;s what you&apos;ll lose access to on 1 May 2026.
+                {isV2
+                  ? "You're canceling your subscription. Here's what you'll lose access to on 1 May 2026."
+                  : "You're downgrading from Premium to Basic. Here's what you'll lose access to on 1 May 2026."}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
+                Your tier stays active until 30 April 2026
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
-                Your tier stays active until 30 April 2026
+                The money is non-refundable.
               </Typography>
 
               {Object.entries(grouped).map(([category, items]) => (
@@ -162,22 +168,31 @@ export default function CancelPage() {
                 <Button
                   variant="outlined"
                   color="primary"
-                  onClick={() => router.push('/subscription?downgraded=true')}
+                  onClick={() => router.push('/subscription?downgraded=true' + (isV2 ? '&v=2' : ''))}
                 >
                   CONFIRM
                 </Button>
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => router.push('/subscription')}
+                  onClick={() => router.push(isV2 ? '/subscription?v=2' : '/subscription')}
                 >
-                  KEEP PREMIUM
+                  {isV2 ? 'KEEP PLAN' : 'KEEP PREMIUM'}
                 </Button>
               </Box>
             </CardContent>
           </Card>
         )}
       </Box>
+  );
+}
+
+export default function CancelPage() {
+  return (
+    <AppShell>
+      <Suspense fallback={<Box sx={{ p: 3 }}><Typography>Loading…</Typography></Box>}>
+        <CancelContent />
+      </Suspense>
     </AppShell>
   );
 }
